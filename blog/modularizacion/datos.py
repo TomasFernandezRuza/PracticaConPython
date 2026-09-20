@@ -1,39 +1,39 @@
-# Datos del autor
-perfil_autor = {
-    "nombre": "Tomas Fernandez",
-    "email": "tomas@email.com"
-}
+import json
 
-# Estados posibles de los posts
-estados_post = ("borrador", "publicado", "archivado")
+from blog.modularizacion.modelos import Post
 
-# Etiquetas disponibles
-etiquetas_blog = {"python", "programacion", "tecnologia", "linux"}
 
-# Lista de posts
-posts = [
-    {
-        "id": 1,
-        "titulo": "Aprendiendo Python",
-        "contenido": "Python es un lenguaje de programación.",
-        "autor": perfil_autor,
-        "tags": ["python", "programacion"],
-        "estado": "publicado"
-    },
-    {
-        "id": 2,
-        "titulo": "Introduccion a Linux",
-        "contenido": "Linux es un sistema operativo.",
-        "autor": perfil_autor,
-        "tags": ["linux", "tecnologia"],
-        "estado": "publicado"
-    },
-    {
-        "id": 3,
-        "titulo": "",
-        "contenido": "Este post tiene un título vacío.",
-        "autor": perfil_autor,
-        "tags": ["python"],
-        "estado": "borrador"
-    }
-]
+ARCHIVO_JSON = "posts.json"
+
+
+def cargar_posts():
+    try:
+        with open(ARCHIVO_JSON, "r", encoding="utf-8") as archivo:
+            datos = json.load(archivo)
+
+        posts = []
+
+        for dato in datos:
+            post = Post.desde_diccionario(dato)
+            posts.append(post)
+
+        return posts
+
+    except FileNotFoundError:
+        return []
+
+    except json.JSONDecodeError:
+        return []
+
+    except (KeyError, TypeError):
+        return []
+
+
+def guardar_posts(posts):
+    datos = []
+
+    for post in posts:
+        datos.append(post.a_diccionario())
+
+    with open(ARCHIVO_JSON, "w", encoding="utf-8") as archivo:
+        json.dump(datos, archivo, indent=4, ensure_ascii=False)

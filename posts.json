@@ -1,0 +1,29 @@
+[
+    {
+        "id": 1,
+        "titulo": "Aprendiendo POO",
+        "contenido": "Estoy aprendiendo clases en Python",
+        "autor": {
+            "nombre": "Tomas",
+            "bio": "Estudiante"
+        },
+        "tags": [
+            "python",
+            "poo"
+        ],
+        "estado": "publicado"
+    },
+    {
+        "id": 2,
+        "titulo": "practica en python",
+        "contenido": "un lujo",
+        "autor": {
+            "nombre": "tomas",
+            "bio": "incognito"
+        },
+        "tags": [
+            "no se"
+        ],
+        "estado": "activo"
+    }
+]

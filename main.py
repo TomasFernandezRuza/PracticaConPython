@@ -1,58 +1,133 @@
-from blog.modularizacion.datos import posts
-from blog.modularizacion.validaciones import validar_post
-from blog.modularizacion.formateador import listar_posts, buscar_por_titulo, filtrar_por_tag
+from blog.modularizacion.modelos import Autor, Post, Blog
+from blog.modularizacion.datos import cargar_posts, guardar_posts
 
 
-def mostrar_menu():
-    print("\n--- MENU DEL BLOG ---")
-    print("1. Ver todos los posts")
-    print("2. Buscar por titulo")
-    print("3. Filtrar por tag")
-    print("4. Validar posts")
-    print("5. Salir")
+def mostrar_posts(posts):
+    if len(posts) == 0:
+        print("No se encontraron posts.")
+        return
 
-    try:
-        opcion = int(input("Elegí una opción: "))
-        return opcion
-
-    except ValueError:
-        print("Error: tenés que ingresar un número.")
-        return 0
+    for post in posts:
+        print("--------------------")
+        print("Título:", post.titulo)
+        print("Autor:", post.autor.nombre)
+        print("Estado:", post.estado)
 
 
-if __name__ == "__main__":
+def crear_nuevo_post(blog):
+    print("\n--- CREAR POST ---")
+
+    titulo = input("Título: ").strip()
+    contenido = input("Contenido: ").strip()
+    nombre_autor = input("Nombre del autor: ").strip()
+    bio = input("Bio del autor: ").strip()
+    tags_texto = input("Tags separados por coma: ").strip()
+    estado = input("Estado: ").strip()
+
+    if titulo == "" or contenido == "" or nombre_autor == "":
+        print("Error: título, contenido y autor son obligatorios.")
+        return
+
+    tags = []
+
+    for tag in tags_texto.split(","):
+        tag = tag.strip()
+
+        if tag != "":
+            tags.append(tag)
+
+    autor = Autor(nombre_autor, bio)
+
+    nuevo_id = len(blog.posts) + 1
+
+    nuevo_post = Post(
+        nuevo_id,
+        titulo,
+        contenido,
+        autor,
+        tags,
+        estado
+    )
+
+    blog.agregar_post(nuevo_post)
+
+    print("Post creado correctamente.")
+
+
+def main():
+
+    posts = cargar_posts()
+
+    blog = Blog(posts)
 
     while True:
 
-        opcion = mostrar_menu()
+        print("\n--- MENU DEL BLOG ---")
+        print("1. Ver todos los posts")
+        print("2. Buscar por título")
+        print("3. Filtrar por tag")
+        print("4. Crear nuevo post")
+        print("5. Validar posts")
+        print("6. Guardar posts en JSON")
+        print("7. Salir")
 
-        if opcion == 1:
-            listar_posts(posts)
+        opcion = input("Elegí una opción: ")
 
-        elif opcion == 2:
-            termino = input("Ingresá el título a buscar: ")
-            buscar_por_titulo(posts, termino)
+        if opcion == "1":
 
-        elif opcion == 3:
-            tag = input("Ingresá el tag a buscar: ")
-            filtrar_por_tag(posts, tag)
+            mostrar_posts(blog.listar_posts())
 
-        elif opcion == 4:
-            print("\n--- VALIDACION DE POSTS ---")
+        elif opcion == "2":
 
-            for post in posts:
-                valido, mensaje = validar_post(post)
+            titulo = input("Título a buscar: ")
 
-                print(
-                    "Post",
-                    post.get("id", "sin ID"),
-                    ":",
-                    mensaje
-                )
+            resultados = blog.buscar_por_titulo(titulo)
 
-        elif opcion == 5:
-            print("Programa finalizado. ¡Hasta luego!")
+            mostrar_posts(resultados)
+
+        elif opcion == "3":
+
+            tag = input("Tag a buscar: ")
+
+            resultados = blog.filtrar_por_tag(tag)
+
+            mostrar_posts(resultados)
+
+        elif opcion == "4":
+
+            crear_nuevo_post(blog)
+
+        elif opcion == "5":
+
+            print("Validación de posts.")
+
+            for post in blog.posts:
+
+                if post.titulo == "" or post.contenido == "":
+                    print("Post", post.id, "tiene errores.")
+
+                else:
+                    print("Post", post.id, "correcto.")
+
+        elif opcion == "6":
+
+            guardar_posts(blog.posts)
+
+            print("Posts guardados correctamente.")
+
+        elif opcion == "7":
+
+            guardar_posts(blog.posts)
+
+            print("Posts guardados.")
+            print("Hasta luego.")
+
             break
 
-        elif opcion != 0:
-            print("Opción inexistente. Elegí entre 1 y 5.")
+        else:
+
+            print("Opción incorrecta.")
+
+
+if __name__ == "__main__":
+    main()
